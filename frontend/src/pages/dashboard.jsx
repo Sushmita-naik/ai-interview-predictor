@@ -1,104 +1,149 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
+import { logoutUser } from "../services/authService";
+import "./dashboard.css";
 
 function Dashboard() {
-  const user = {
-    name: "Sushmita",
-    resumeScore: 82,
-    interviewScore: 76,
-    interviewsTaken: 5,
-  };
 
-  return (
-    <div style={styles.container}>
-      <h1>Dashboard</h1>
+    const navigate = useNavigate();
 
-      <h2>Welcome, {user.name} 👋</h2>
+    const user = JSON.parse(localStorage.getItem("user"));
 
-      <div style={styles.cardContainer}>
-        <div style={styles.card}>
-          <h3>Resume Score</h3>
-          <p>{user.resumeScore}/100</p>
+    const logout = () => {
+        logoutUser();
+        navigate("/");
+    };
+
+    return (
+
+        <div className="dashboard">
+
+            <div className="navbar">
+
+                <h2>AI Interview Predictor</h2>
+
+                <button
+                    className="logout-btn"
+                    onClick={logout}
+                >
+                    Logout
+                </button>
+
+            </div>
+
+            <div className="welcome">
+
+                <h1>
+                    Welcome,
+                    {user ? ` ${user.name}` : ""}
+                    👋
+                </h1>
+
+                <p>
+                    Let's prepare for your dream job today.
+                </p>
+
+            </div>
+
+            <div className="cards">
+
+                <div className="card">
+
+                    <h2>📄 Upload Resume</h2>
+
+                    <p>
+                        Upload your latest resume.
+                    </p>
+
+                    <button
+                        onClick={() =>
+                            navigate("/uploadresume")
+                        }
+                    >
+                        Upload
+                    </button>
+
+                </div>
+
+                <div className="card">
+
+                    <h2>🤖 AI Interview</h2>
+
+                    <p>
+                        Practice AI Interview Questions.
+                    </p>
+
+                    <button
+                        onClick={() =>
+                            navigate("/interview")
+                        }
+                    >
+                        Start
+                    </button>
+
+                </div>
+
+                <div className="card">
+
+                    <h2>📊 Resume Analysis</h2>
+
+                    <p>
+                        Analyze Resume & Skills.
+                    </p>
+
+                    <button>
+                        Analyze
+                    </button>
+
+                </div>
+
+                <div className="card">
+
+                    <h2>💼 Placement Prediction</h2>
+
+                    <p>
+                        Predict your placement chances.
+                    </p>
+
+                    <button>
+                        Predict
+                    </button>
+
+                </div>
+
+                <div className="card">
+
+                    <h2>💰 Salary Prediction</h2>
+
+                    <p>
+                        Predict your expected salary.
+                    </p>
+
+                    <button>
+                        View
+                    </button>
+
+                </div>
+
+                <div className="card">
+
+                    <h2>📈 Reports</h2>
+
+                    <p>
+                        View your complete report.
+                    </p>
+
+                    <button>
+                        Reports
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div style={styles.card}>
-          <h3>Interview Score</h3>
-          <p>{user.interviewScore}/100</p>
-        </div>
+    );
 
-        <div style={styles.card}>
-          <h3>Interviews Taken</h3>
-          <p>{user.interviewsTaken}</p>
-        </div>
-      </div>
-
-      <div style={styles.actions}>
-        <h2>Quick Actions</h2>
-
-        <button style={styles.button}>
-          Upload Resume
-        </button>
-
-        <button style={styles.button}>
-          Start Interview
-        </button>
-
-        <button style={styles.button}>
-          View Reports
-        </button>
-      </div>
-
-      <div style={styles.activity}>
-        <h2>Recent Activity</h2>
-
-        <ul>
-          <li>Resume Uploaded</li>
-          <li>Technical Interview Completed</li>
-          <li>Report Generated</li>
-        </ul>
-      </div>
-    </div>
-  );
 }
-
-const styles = {
-  container: {
-    padding: "30px",
-    fontFamily: "Arial",
-  },
-
-  cardContainer: {
-    display: "flex",
-    gap: "20px",
-    marginTop: "20px",
-    marginBottom: "30px",
-  },
-
-  card: {
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    padding: "20px",
-    width: "220px",
-    textAlign: "center",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-  },
-
-  actions: {
-    marginTop: "20px",
-  },
-
-  button: {
-    padding: "10px 20px",
-    marginRight: "10px",
-    cursor: "pointer",
-    borderRadius: "5px",
-    border: "none",
-    backgroundColor: "#2563eb",
-    color: "white",
-  },
-
-  activity: {
-    marginTop: "40px",
-  },
-};
 
 export default Dashboard;

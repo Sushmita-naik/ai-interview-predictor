@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS interview_questions (
     user_id INTEGER,
     question TEXT,
     answer TEXT,
+    answer INTEGER,
     score REAL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id)

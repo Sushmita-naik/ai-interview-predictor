@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/authService";
+import { registerUser, loginUser } from "../services/authService";
+import "../styles/auth.css";
 
 function Register() {
   const navigate = useNavigate();
@@ -10,129 +11,163 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    setError("");
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match.");
       return;
     }
 
+    setLoading(true);
+
     try {
+      // Register user
       await registerUser({
         name,
         email,
         password,
       });
 
-      alert("Registration Successful!");
+      // Automatically login
+      await loginUser({
+        email,
+        password,
+      });
 
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      // Go directly to Dashboard
+      navigate("/dashboard");
 
-      // Go to Login page
-      navigate("/");
-    } catch (error) {
-      console.error(error);
-
-      if (error.response) {
-        alert(error.response.data.detail);
+    } catch (err) {
+      if (err.response) {
+        setError(err.response.data.detail);
       } else {
-        alert("Server Error");
+        setError("Unable to connect to server.");
       }
     }
+
+    setLoading(false);
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1>Create Account</h1>
+    <div className="auth-container">
+
+      <div className="auth-card">
+
+        <div className="logo">🚀</div>
+
+        <h1 className="title">
+          Create Account
+        </h1>
+
+        <p className="subtitle">
+          Start preparing for your dream job
+        </p>
+
+        {error && (
+          <div className="error-box">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleRegister}>
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={styles.input}
-            required
-          />
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
-            required
-          />
+          <div className="input-group">
+            <label>Full Name</label>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-            required
-          />
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e)=>setName(e.target.value)}
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            style={styles.input}
-            required
-          />
+          <div className="input-group">
+            <label>Email</label>
 
-          <button type="submit" style={styles.button}>
-            Register
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e)=>setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Password</label>
+
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter password"
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Confirm Password</label>
+
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e)=>setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="show-password">
+
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() =>
+                setShowPassword(!showPassword)
+              }
+            />
+
+            {" "}Show Password
+
+          </div>
+
+          <br />
+
+          <button
+            className="btn-primary"
+            type="submit"
+          >
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
+
         </form>
+
+        <div className="bottom-text">
+
+          Already have an account?
+
+          <button
+            className="link-btn"
+            onClick={() => navigate("/")}
+          >
+            Login
+          </button>
+
+        </div>
+
       </div>
+
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "100vh",
-    backgroundColor: "#f5f5f5",
-  },
-
-  card: {
-    backgroundColor: "#fff",
-    padding: "30px",
-    borderRadius: "12px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    width: "400px",
-  },
-
-  input: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "12px",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    boxSizing: "border-box",
-  },
-
-  button: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "20px",
-    border: "none",
-    borderRadius: "8px",
-    backgroundColor: "#2563eb",
-    color: "#fff",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-};
 
 export default Register;

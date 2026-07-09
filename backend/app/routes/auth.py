@@ -51,6 +51,7 @@ def login(user: UserLogin):
     conn = get_connection()
     cursor = conn.cursor()
 
+    # Check whether email exists
     cursor.execute(
         """
         SELECT * FROM users
@@ -61,32 +62,38 @@ def login(user: UserLogin):
 
     existing_user = cursor.fetchone()
 
-    conn.close()
-
     if not existing_user:
+        conn.close()
+
         raise HTTPException(
-            status_code=401,
-            detail="Invalid email or password"
+            status_code=404,
+            detail="Email not registered"
         )
 
     # Verify password
     if not bcrypt.checkpw(
-        user.password.encode("utf-8"),
-        existing_user["password"].encode("utf-8")
+        user.password.encode(),
+        existing_user["password"].encode()
     ):
+        conn.close()
+
         raise HTTPException(
             status_code=401,
-            detail="Invalid email or password"
+            detail="Incorrect password"
         )
-    token = create_access_token(
-    {
-        "user_id": existing_user["id"],
-        "email": existing_user["email"]
-    }
-)
+
+    conn.close()
+
+    access_token = create_access_token(
+        {
+            "user_id": existing_user["id"],
+            "email": existing_user["email"]
+        }
+    )
+
     return {
         "message": "Login Successful",
-        "access_token": token,
+        "access_token": access_token,
         "token_type": "bearer",
         "user": {
             "id": existing_user["id"],
@@ -94,7 +101,6 @@ def login(user: UserLogin):
             "email": existing_user["email"]
         }
     }
-
 
 @router.get("/users")
 def get_users():
